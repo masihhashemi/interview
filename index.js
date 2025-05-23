@@ -10,6 +10,7 @@ import WebSocket from 'ws';
 import dotenv from 'dotenv';
 import fastifyWs from '@fastify/websocket';
 import fastifyFormBody from '@fastify/formbody';
+import { spawn } from 'child_process';
 
 dotenv.config();
 const { OPENAI_API_KEY, MODEL = 'gpt-4o-2024-05-13' } = process.env;
@@ -85,12 +86,27 @@ fastify.register(async () => {
 
     /* -------- finalize: runs once when call ends -------- */
     const finalize = () => {
-      if (finalize.done) return;           // idempotent
+      if (finalize.done) return;        // ensure idempotent
       finalize.done = true;
-      fs.writeFileSync('call-transcript.json',
-                       JSON.stringify(transcript, null, 2), 'utf8');
+
+      // 1️⃣  write raw transcript
+      fs.writeFileSync(
+        'call-transcript.json',
+        JSON.stringify(transcript, null, 2),
+        'utf8'
+      );
       console.log('📄  call-transcript.json written');
-      /*  — optional: generate report here the same way as before — */
+
+      // 2️⃣  spawn report.js in a child process
+      const child = spawn('node', ['report.js'], {
+        cwd: process.cwd(),   // same directory
+        stdio: 'inherit',     // pipe its logs to Azure log‑stream
+        env: process.env      // pass OPENAI_API_KEY, etc.
+      });
+
+      child.on('exit', code =>
+        console.log(`📑 report.js finished (exit ${code})`)
+      );
     };
 
     /* -------- connect to OpenAI Realtime -------- */
