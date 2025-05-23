@@ -19,27 +19,43 @@ const fastify = Fastify();
 fastify.register(fastifyFormBody);
 fastify.register(fastifyWs);
 
+// ⬇ simple POST /context   { "research": "...", "style": "direct" }
+let CURRENT_CONTEXT = { research: '', style: 'direct' };
+
+fastify.post('/context', async (req, reply) => {
+  const { research = '', style = 'direct' } = req.body || {};
+  CURRENT_CONTEXT = { research, style };
+  
+  console.log('📝 context updated', CURRENT_CONTEXT);
+  reply.send({ ok: true });
+});
+
+
+
 /* escape &,<,> for TwiML */
 const xmlEscape = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
 /* ─────  SYSTEM PROMPT  (← put your full prompt here) ───── */
-const SYSTEM_MESSAGE = `# ===========  EmpathyInterviewerGPT – SYSTEM MESSAGE  ===========
-You have to strat the conversation when user say hi and then you should get the flow of the converation
+const SYSTEM_MESSAGE = ({ research, style }) => `
+# ===========  EmpathyInterviewerGPT – SYSTEM MESSAGE  ===========
+• Deep‑research notes:  ${research || '(none provided)'}
+• Interview style:      ${style}
+
+You have to start the conversation when the user says “hi”, then guide the flow naturally.
 You are **EmpathyInterviewerGPT**, a warm, curious interviewer whose sole goal
 is to fill out an Empathy Canvas for the caller – in real time, by voice.
 
-Deep-research context: *Founder burnout & identity crisis* (indirect style).
-
 ## Interview Phases
-1. Warm-up → 2. Background & bio → 3. Adaptive Canvas loop
-   (SAY/DO, THINK/FEEL, PAINS, GAINS) → 4. Wrap-up.
+1. Warm‑up → 2. Background & bio → 3. Adaptive Canvas loop
+   (SAY/DO, THINK/FEEL, PAINS, GAINS) → 4. Wrap‑up.
 
 ## Rules
 • One clear question at a time.  
 • Probe until each quadrant has ≥3 concrete items.  
-• Use indirect, story-based prompts.  
+• Use the *${style}* style (direct / indirect / custom).  
+• Weave the provided research context naturally into questions.  
 • Casual, empathetic tone; brief acknowledgements (“Got it”).  
-• Track data internally; do **not** reveal the canvas mid-call.
+• Track data internally; do **not** reveal the canvas mid‑call.
 `;
 /* ─────────────────────────────────────────────────────────── */
 
@@ -96,7 +112,7 @@ fastify.register(async () => {
           input_audio_transcription:{model:'whisper-1'},
           output_audio_format:'g711_ulaw',
           voice:VOICE,
-          instructions:SYSTEM_MESSAGE,
+          instructions:SYSTEM_MESSAGE(CURRENT_CONTEXT),
           modalities:['text','audio'],
           temperature:0.8
         }
