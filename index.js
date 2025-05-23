@@ -74,6 +74,26 @@ fastify.all('/incoming-call', (req, reply) => {
 </Response>`);
 });
 
+// Serve the generated report JSON
+fastify.get('/call-report.json', (request, reply) => {
+  try {
+    const data = fs.readFileSync('call-report.json', 'utf8');
+    reply.header('Content-Type', 'application/json').send(data);
+  } catch (err) {
+    reply.status(404).send({ error: 'Report not found' });
+  }
+});
+
+// (Optional) Serve the transcript JSON
+fastify.get('/call-transcript.json', (request, reply) => {
+  try {
+    const data = fs.readFileSync('call-transcript.json', 'utf8');
+    reply.header('Content-Type', 'application/json').send(data);
+  } catch (err) {
+    reply.status(404).send({ error: 'Transcript not found' });
+  }
+});
+
 /* ---------- Media stream ---------- */
 fastify.register(async () => {
   fastify.get('/media-stream', { websocket:true }, (conn) => {
