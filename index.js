@@ -1,9 +1,9 @@
-/*********************************************************************
+/*************************************************************
  *  Empathy-Canvas Interviewer – hard-coded research   v1.4
  *  • Inbound Twilio call  → Whisper → GPT-4o Realtime
  *  • Saves call-transcript.json      (report generation optional)
  *  • Handles the timing race + sends streamSid so audio plays back
- *********************************************************************/
+ *************************************************************/
 import fs from 'fs';
 import Fastify from 'fastify';
 import WebSocket from 'ws';
@@ -49,10 +49,8 @@ const PORT  = process.env.PORT || 5050;
 /* ---------- Twilio webhook ---------- */
 fastify.all('/incoming-call', (req, reply) => {
   console.log('✅ Twilio /incoming-call was triggered');
-<<<<<<< HEAD
 
-=======
->>>>>>> 5bae4e4 (add logging for Twilio incoming call webhook trigger)
+  console.log('✅ Twilio /incoming-call was triggered: ' + new Date().toISOString());
   const wsURL = `wss://${req.headers.host}/media-stream`;
   reply.type('text/xml').send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
