@@ -44,7 +44,7 @@ Deep-research context: *Founder burnout & identity crisis* (indirect style).
 /* ─────────────────────────────────────────────────────────── */
 
 const VOICE = 'alloy';
-const PORT  = process.env.PORT || 5050;
+const PORT  = process.env.PORT || 8080;
 
 /* ---------- Twilio webhook ---------- */
 fastify.all('/incoming-call', (req, reply) => {
