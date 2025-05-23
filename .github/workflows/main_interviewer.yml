@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: '20.x'
 
-      - name: npm install, build, and test (skip test)
+      - name: npm install, build, and test
         run: |
           npm install
           npm run build --if-present
@@ -60,9 +60,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_B482575921664FE0AC073A7ED895B9C9 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_51D281A2679141A1B33156CF4F684ACC }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_FF4401CCF3E44B1D842970E9BF04D5A4 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_6710B3D4D3734E87A8002C152D76A136 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_DA6D3C09A6EE4B149398CE3711AA7AC5 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3FFFE350DF3F40DE82BF3347F6477A23 }}
 
       - name: 'Deploy to Azure Web App'
         id: deploy-to-webapp
